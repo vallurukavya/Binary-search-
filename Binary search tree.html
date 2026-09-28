@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Binary Search Tree</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            text-align: center;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #2563eb;
+            margin-bottom: 25px;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 180px;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            padding: 12px 18px;
+            margin: 5px;
+            border: none;
+            border-radius: 6px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .delete-btn {
+            background: #dc2626;
+        }
+
+        .delete-btn:hover {
+            background: #b91c1c;
+        }
+
+        .clear-btn {
+            background: #64748b;
+        }
+
+        .clear-btn:hover {
+            background: #475569;
+        }
+
+        #message {
+            margin: 20px;
+            font-weight: bold;
+            color: #333;
+            min-height: 20px;
+        }
+
+        #tree {
+            margin-top: 30px;
+            overflow: auto;
+            padding: 30px;
+        }
+
+        /* Tree node */
+
+        .node-container {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .node {
+            width: 60px;
+            height: 60px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #2563eb;
+            color: white;
+
+            border: 4px solid #1e3a8a;
+            border-radius: 50%;
+
+            font-size: 18px;
+            font-weight: bold;
+
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Children */
+
+        .children {
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            margin-top: 35px;
+        }
+
+        .child {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .empty {
+            width: 60px;
+            height: 60px;
+        }
+
+        /* Traversals */
+
+        .traversals {
+            margin-top: 40px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .traversals h2 {
+            color: #2563eb;
+            margin-bottom: 15px;
+        }
+
+        .traversals p {
+            margin: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Binary Search Tree</h1>
+
+    <div class="controls">
+
+        <input
+            type="number"
+            id="value"
+            placeholder="Enter value"
+        >
+
+        <button onclick="insertValue()">
+            Insert
+        </button>
+
+        <button onclick="searchValue()">
+            Search
+        </button>
+
+        <button
+            class="delete-btn"
+            onclick="deleteValue()"
+        >
+            Delete
+        </button>
+
+        <button
+            class="clear-btn"
+            onclick="clearTree()"
+        >
+            Clear
+        </button>
+
+    </div>
+
+    <p id="message">
+        Enter a value to start.
+    </p>
+
+    <div id="tree"></div>
+
+    <div class="traversals">
+
+        <h2>Tree Traversals</h2>
+
+        <p>
+            <b>Inorder:</b>
+            <span id="inorder">-</span>
+        </p>
+
+        <p>
+            <b>Preorder:</b>
+            <span id="preorder">-</span>
+        </p>
+
+        <p>
+            <b>Postorder:</b>
+            <span id="postorder">-</span>
+        </p>
+
+    </div>
+
+
+    <script>
+
+        // =========================================
+        // BST NODE
+        // =========================================
+
+        class Node {
+
+            constructor(value) {
+
+                this.value = value;
+
+                this.left = null;
+
+                this.right = null;
+            }
+        }
+
+
+        // =========================================
+        // BINARY SEARCH TREE
+        // =========================================
+
+        class BinarySearchTree {
+
+            constructor() {
+
+                this.root = null;
+            }
+
+
+            // =====================================
+            // INSERT
+            // =====================================
+
+            insert(value) {
+
+                if (this.root === null) {
+
+                    this.root =
+                        new Node(value);
+
+                    return true;
+                }
+
+                return this.insertNode(
+                    this.root,
+                    value
+                );
+            }
+
+
+            insertNode(node, value) {
+
+                // Duplicate value
+
+                if (value === node.value) {
+
+                    return false;
+                }
+
+
+                // Insert into left subtree
+
+                if (value < node.value) {
+
+                    if (node.left === null) {
+
+                        node.left =
+                            new Node(value);
+
+                        return true;
+                    }
+
+                    return this.insertNode(
+                        node.left,
+                        value
+                    );
+                }
+
+
+                // Insert into right subtree
+
+                else {
+
+                    if (node.right === null) {
+
+                        node.right =
+                            new Node(value);
+
+                        return true;
+                    }
+
+                    return this.insertNode(
+                        node.right,
+                        value
+                    );
+                }
+            }
+
+
+            // =====================================
+            // SEARCH
+            // =====================================
+
+            search(value) {
+
+                return this.searchNode(
+                    this.root,
+                    value
+                );
+            }
+
+
+            searchNode(node, value) {
+
+                if (node === null) {
+
+                    return false;
+                }
+
+
+                if (node.value === value) {
+
+                    return true;
+                }
+
+
+                if (value < node.value) {
+
+                    return this.searchNode(
+                        node.left,
+                        value
+                    );
+                }
+
+
+                return this.searchNode(
+                    node.right,
+                    value
+                );
+            }
+
+
+            // =====================================
+            // DELETE
+            // =====================================
+
+            delete(value) {
+
+                if (!this.search(value)) {
+
+                    return false;
+                }
+
+                this.root =
+                    this.deleteNode(
+                        this.root,
+                        value
+                    );
+
+                return true;
+            }
+
+
+            deleteNode(node, value) {
+
+                if (node === null) {
+
+                    return null;
+                }
+
+
+                // Search left
+
+                if (value < node.value) {
+
+                    node.left =
+                        this.deleteNode(
+                            node.left,
+                            value
+                        );
+
+                    return node;
+                }
+
+
+                // Search right
+
+                if (value > node.value) {
+
+                    node.right =
+                        this.deleteNode(
+                            node.right,
+                            value
+                        );
+
+                    return node;
+                }
+
+
+                // =================================
+                // NODE FOUND
+                // =================================
+
+
+                // Case 1:
+                // No children
+
+                if (
+                    node.left === null &&
+                    node.right === null
+                ) {
+
+                    return null;
+                }
+
+
+                // Case 2:
+                // Only right child
+
+                if (node.left === null) {
+
+                    return node.right;
+                }
+
+
+                // Case 3:
+                // Only left child
+
+                if (node.right === null) {
+
+                    return node.left;
+                }
+
+
+                // Case 4:
+                // Two children
+
+                let successor =
+                    this.findMin(
+                        node.right
+                    );
+
+                node.value =
+                    successor.value;
+
+                node.right =
+                    this.deleteNode(
+                        node.right,
+                        successor.value
+                    );
+
+                return node;
+            }
+
+
+            // =====================================
+            // FIND MINIMUM
+            // =====================================
+
+            findMin(node) {
+
+                while (
+                    node.left !== null
+                ) {
+
+                    node = node.left;
+                }
+
+                return node;
+            }
+
+
+            // =====================================
+            // INORDER
+            // =====================================
+
+            inorder(node, result = []) {
+
+                if (node !== null) {
+
+                    this.inorder(
+                        node.left,
+                        result
+                    );
+
+                    result.push(
+                        node.value
+                    );
+
+                    this.inorder(
+                        node.right,
+                        result
+                    );
+                }
+
+                return result;
+            }
+
+
+            // =====================================
+            // PREORDER
+            // =====================================
+
+            preorder(node, result = []) {
+
+                if (node !== null) {
+
+                    result.push(
+                        node.value
+                    );
+
+                    this.preorder(
+                        node.left,
+                        result
+                    );
+
+                    this.preorder(
+                        node.right,
+                        result
+                    );
+                }
+
+                return result;
+            }
+
+
+            // =====================================
+            // POSTORDER
+            // =====================================
+
+            postorder(node, result = []) {
+
+                if (node !== null) {
+
+                    this.postorder(
+                        node.left,
+                        result
+                    );
+
+                    this.postorder(
+                        node.right,
+                        result
+                    );
+
+                    result.push(
+                        node.value
+                    );
+                }
+
+                return result;
+            }
+        }
+
+
+        // =========================================
+        // CREATE BST
+        // =========================================
+
+        let bst =
+            new BinarySearchTree();
+
+
+        // =========================================
+        // INSERT BUTTON
+        // =========================================
+
+        function insertValue() {
+
+            let input =
+                document.getElementById("value");
+
+            let value =
+                Number(input.value);
+
+
+            if (input.value === "") {
+
+                showMessage(
+                    "Please enter a value."
+                );
+
+                return;
+            }
+
+
+            let inserted =
+                bst.insert(value);
+
+
+            if (inserted) {
+
+                showMessage(
+                    value +
+                    " inserted successfully."
+                );
+
+            } else {
+
+                showMessage(
+                    value +
+                    " already exists."
+                );
+            }
+
+
+            input.value = "";
+
+            displayTree();
+        }
+
+
+        // =========================================
+        // SEARCH BUTTON
+        // =========================================
+
+        function searchValue() {
+
+            let input =
+                document.getElementById("value");
+
+            let value =
+                Number(input.value);
+
+
+            if (input.value === "") {
+
+                showMessage(
+                    "Please enter a value."
+                );
+
+                return;
+            }
+
+
+            let found =
+                bst.search(value);
+
+
+            if (found) {
+
+                showMessage(
+                    value +
+                    " found in BST."
+                );
+
+            } else {
+
+                showMessage(
+                    value +
+                    " not found in BST."
+                );
+            }
+        }
+
+
+        // =========================================
+        // DELETE BUTTON
+        // =========================================
+
+        function deleteValue() {
+
+            let input =
+                document.getElementById("value");
+
+            let value =
+                Number(input.value);
+
+
+            if (input.value === "") {
+
+                showMessage(
+                    "Please enter a value."
+                );
+
+                return;
+            }
+
+
+            let deleted =
+                bst.delete(value);
+
+
+            if (deleted) {
+
+                showMessage(
+                    value +
+                    " deleted successfully."
+                );
+
+            } else {
+
+                showMessage(
+                    value +
+                    " not found."
+                );
+            }
+
+
+            input.value = "";
+
+            displayTree();
+        }
+
+
+        // =========================================
+        // CLEAR TREE
+        // =========================================
+
+        function clearTree() {
+
+            bst =
+                new BinarySearchTree();
+
+            document.getElementById(
+                "tree"
+            ).innerHTML = "";
+
+            document.getElementById(
+                "inorder"
+            ).textContent = "-";
+
+            document.getElementById(
+                "preorder"
+            ).textContent = "-";
+
+            document.getElementById(
+                "postorder"
+            ).textContent = "-";
+
+            showMessage(
+                "BST cleared."
+            );
+        }
+
+
+        // =========================================
+        // MESSAGE
+        // =========================================
+
+        function showMessage(message) {
+
+            document.getElementById(
+                "message"
+            ).textContent = message;
+        }
+
+
+        // =========================================
+        // DISPLAY TREE
+        // =========================================
+
+        function displayTree() {
+
+            let tree =
+                document.getElementById(
+                    "tree"
+                );
+
+            tree.innerHTML = "";
+
+
+            if (bst.root === null) {
+
+                tree.innerHTML =
+                    "<h3>Tree is empty</h3>";
+
+                updateTraversals();
+
+                return;
+            }
+
+
+            tree.appendChild(
+                createNodeElement(
+                    bst.root
+                )
+            );
+
+
+            updateTraversals();
+        }
+
+
+        // =========================================
+        // CREATE NODE ELEMENT
+        // =========================================
+
+        function createNodeElement(node) {
+
+            let container =
+                document.createElement("div");
+
+            container.className =
+                "node-container";
+
+
+            // Node
+
+            let nodeElement =
+                document.createElement("div");
+
+            nodeElement.className =
+                "node";
+
+            nodeElement.textContent =
+                node.value;
+
+
+            container.appendChild(
+                nodeElement
+            );
+
+
+            // Children
+
+            if (
+                node.left !== null ||
+                node.right !== null
+            ) {
+
+                let children =
+                    document.createElement("div");
+
+                children.className =
+                    "children";
+
+
+                // Left child
+
+                let left =
+                    document.createElement("div");
+
+                left.className =
+                    "child";
+
+
+                if (node.left !== null) {
+
+                    left.appendChild(
+                        createNodeElement(
+                            node.left
+                        )
+                    );
+
+                } else {
+
+                    let empty =
+                        document.createElement(
+                            "div"
+                        );
+
+                    empty.className =
+                        "empty";
+
+                    left.appendChild(
+                        empty
+                    );
+                }
+
+
+                children.appendChild(left);
+
+
+                // Right child
+
+                let right =
+                    document.createElement("div");
+
+                right.className =
+                    "child";
+
+
+                if (node.right !== null) {
+
+                    right.appendChild(
+                        createNodeElement(
+                            node.right
+                        )
+                    );
+
+                } else {
+
+                    let empty =
+                        document.createElement(
+                            "div"
+                        );
+
+                    empty.className =
+                        "empty";
+
+                    right.appendChild(
+                        empty
+                    );
+                }
+
+
+                children.appendChild(right);
+
+                container.appendChild(
+                    children
+                );
+            }
+
+
+            return container;
+        }
+
+
+        // =========================================
+        // UPDATE TRAVERSALS
+        // =========================================
+
+        function updateTraversals() {
+
+            let inorder =
+                bst.inorder(bst.root);
+
+            let preorder =
+                bst.preorder(bst.root);
+
+            let postorder =
+                bst.postorder(bst.root);
+
+
+            document.getElementById(
+                "inorder"
+            ).textContent =
+                inorder.length
+                    ? inorder.join(" → ")
+                    : "-";
+
+
+            document.getElementById(
+                "preorder"
+            ).textContent =
+                preorder.length
+                    ? preorder.join(" → ")
+                    : "-";
+
+
+            document.getElementById(
+                "postorder"
+            ).textContent =
+                postorder.length
+                    ? postorder.join(" → ")
+                    : "-";
+        }
+
+    </script>
+
+</body>
+</html>
